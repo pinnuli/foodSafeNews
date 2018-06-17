@@ -30,6 +30,7 @@ public class DBStatement {
 		}
 	}
 	
+	//返回数据库连接对象
 	public static Connection getConnection(){
 		return conn;
 	}	

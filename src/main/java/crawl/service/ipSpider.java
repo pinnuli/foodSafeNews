@@ -31,6 +31,7 @@ public class ipSpider {
 	static String testUrl = "http://ip.chinaz.com/getip.aspx";
 	static String rootPath = System.getProperty("user.dir");
 	
+	// 获取速度较快的可用代理并保存到文件proxy.txt
 	public static void getProxyIp() {
 		try {
 			
@@ -63,6 +64,7 @@ public class ipSpider {
 		}
 	}
 	
+	// 测试代理ip的速度
 	public static boolean testIp(String ip, int port) {
 		try {
 			

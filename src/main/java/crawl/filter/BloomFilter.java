@@ -20,11 +20,13 @@ public class BloomFilter implements Serializable{
 	
 	private static final int DEFAULT_SIZE = 1 << 25;
 	
+	// 不同哈希函数的种子，一般应取质数 
 	private static final int[] seeds = new int[]{5, 7, 11, 13, 31, 37, 61};
 	
 	private BitSet bits = null;
 	private SimpleHash[] func = new SimpleHash[seeds.length];
 	
+	//构造方法
 	public  BloomFilter() {
 		for (int i = 0; i < seeds.length; i++) {
 			func[i] = new SimpleHash(DEFAULT_SIZE, seeds[i]);
@@ -44,16 +46,19 @@ public class BloomFilter implements Serializable{
 		}
 	}
 	
+	// 将字符串标记到bits中
 	public synchronized void add(String value) {
 		for (SimpleHash f : func) {
 			bits.set(f.hash(value), true);
 		}
 	}
 	
+	//返回bits
 	public BitSet getBitset() {
 		return bits;
 	}
 	
+	//判断字符串是否已经被bits标记
 	public boolean contains(String value) {
 		if(value == null) {
 			return false;
@@ -66,6 +71,7 @@ public class BloomFilter implements Serializable{
 		return ret;
 	}
 	
+	//哈希函数类
 	public static class SimpleHash {
 		private int cap;
 		private int seed;

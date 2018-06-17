@@ -13,6 +13,7 @@ public class Recognition {
 	// 判断模型接口
 	static final String REQUESTURL = "http://bringtree.ddns.net:5000/news_recognition";
 
+	//向判定模型发出http请求，接收判定结果并返回
 	public static boolean isSafe(String title) {
 		HttpURLConnection con = null;
 		String param = "news_title=" + title;

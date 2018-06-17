@@ -20,6 +20,8 @@ import model.*;
 import util.*;
 public class ArticleDao {
 	static final int PAGENUM = 20;
+	
+	//添加新闻文章到数据库
 	public void addArticle(Article article) throws Exception{
 		Date date = new Date();
 		Timestamp timestamp = new Timestamp(date.getTime());
@@ -46,6 +48,7 @@ public class ArticleDao {
 		}
 	}
 	
+	//查询指定页的新闻，并以json格式数组返回
 	public JSONArray query(int page) throws Exception{
 		JSONObject jsonobj = new JSONObject();
 		List<Article> result=new ArrayList<Article>();
@@ -72,6 +75,7 @@ public class ArticleDao {
 		return new JSONArray(result);
 	}
 	
+	//返回数据库新闻总数
 	public int getTotalCount() throws Exception{
 		int count = 0;
 		Connection conn=DBStatement.getConnection();

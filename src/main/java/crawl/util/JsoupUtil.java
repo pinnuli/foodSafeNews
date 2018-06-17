@@ -10,6 +10,8 @@ public class JsoupUtil {
 
 	static Document doc = null;
 	static int requestCount = 0;
+	
+	// 判断是否抓取网页成功，成功则返回，否则重置代理ip
 	public static Document getDocument(String url) {
 		doc = get(url);
 		if ((doc == null || doc.toString().trim().equals("")) && requestCount < 10) {
@@ -22,6 +24,7 @@ public class JsoupUtil {
 		
 	}
 	
+	//抓取网页内容并返回
 	public static Document get(String url) {
 		String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36";
 		try {

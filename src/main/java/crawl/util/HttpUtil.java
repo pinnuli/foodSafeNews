@@ -12,6 +12,7 @@ public class HttpUtil {
 	//获取项目路径
 	static String rootPath = System.getProperty("user.dir");
 	
+	//设置代理ip
 	public static void setProxyIp() {
 		try{
 			List<String> ipList = new ArrayList<String>();

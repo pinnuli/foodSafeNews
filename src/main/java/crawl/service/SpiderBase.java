@@ -68,6 +68,7 @@ public abstract class SpiderBase implements Serializable{
 	static Connection conn = DBStatement.getConnection();
 	static PreparedStatement ps = null;
 	
+	//开始爬虫
 	public void start() throws Exception{
 		//日期初始化为当前日期
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -81,6 +82,7 @@ public abstract class SpiderBase implements Serializable{
 		
 	}
 	
+	//检查是否已经有爬过的url
 	public void getStart() {
 		File urlsSer = new File("urlQueue.ser");
 		if(urlsSer.exists()) {
@@ -101,6 +103,7 @@ public abstract class SpiderBase implements Serializable{
 			getAllUrls();
 		}
 	}
+	
 	//开启多个线性进行爬网页
 	public void mutilThreads() throws Exception{
 		for (int i = 0; i < DEFAULT_THREAD_NUM; i++) {
@@ -224,32 +227,7 @@ public abstract class SpiderBase implements Serializable{
 	// 获取分类新闻每天的url，解析json数组，并放入阻塞队列
 	public abstract void getDateUrl(String dateEntryUrl) ;
 	
-	// 得到近三个月的日期列表：格式为2018-03-20
-	public static List<String> getThreeMonths() {
-		Calendar begin = Calendar.getInstance();
-		begin.setTime(new Date());
-		begin.add(Calendar.MONTH, -3);
-		begin.add(Calendar.DATE, +1);
-		Date result = begin.getTime();
-		Calendar end = Calendar.getInstance();
-		Long startTime = begin.getTimeInMillis();
-		Long endTime = end.getTimeInMillis();
-		Long oneDay = 1000 * 60 * 60 * 24l;
-		List<String> dates = new ArrayList<String>();
-		Long time = startTime;
-		int i = 0;
-		while(time <= endTime) {
-			Date d = new Date(time);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			dates.add(i, df.format(d));
-			i++;
-			time += oneDay;
-		}
-		Date d = new Date(time);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		System.out.println(dates);
-		return dates;
-	}
+	
 	
 	//设置日期，返回当前日期后并将当前日期设置为前一天
 	public static void setFrontDay() throws Exception{

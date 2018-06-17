@@ -22,7 +22,8 @@ public class ArticlesListServlet extends HttpServlet {
 		super.destroy(); // Just puts "destroy" string in log
 		// Put your code here
 	}
-
+	
+	//处理get请求方式
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/json; charset=utf-8");
 		PrintWriter out = response.getWriter();
@@ -44,7 +45,8 @@ public class ArticlesListServlet extends HttpServlet {
 			out.print(errmsg); 
 		}
 	}
-
+	
+	//处理post请求，直接转发到get
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		doGet(request, response);
