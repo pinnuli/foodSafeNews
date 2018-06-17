@@ -48,12 +48,13 @@ public abstract class SpiderBase implements Serializable{
 	protected static BlockingQueue<String> urlQueue = null;
 	
 	//布隆算法去重
-	static BloomFilter filter = new BloomFilter();
+	protected static BloomFilter filter = new BloomFilter();
 	
-	static String urlPrefix;
+	protected static String urlPrefix = "";
 	
-	static String urlPostfix;
+	protected static String urlPostfix = "";
 	
+	protected static String currentDate = "";
 	//设置爬取深度
 	static int DEFAULT_DEPTH = 10;
 		
@@ -67,7 +68,12 @@ public abstract class SpiderBase implements Serializable{
 	static Connection conn = DBStatement.getConnection();
 	static PreparedStatement ps = null;
 	
-	public void start() {
+	public void start() throws Exception{
+		//日期初始化为当前日期
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calendar = Calendar.getInstance();//获取日历实例  
+		Date d = new Date();  
+        currentDate = sdf.format(d);    
 		getStart();
 		mutilThreads();
 		listenThreads();
@@ -96,24 +102,31 @@ public abstract class SpiderBase implements Serializable{
 		}
 	}
 	//开启多个线性进行爬网页
-	public void mutilThreads() {
+	public void mutilThreads() throws Exception{
 		for (int i = 0; i < DEFAULT_THREAD_NUM; i++) {
 			Thread a = new Thread(new Runnable() {
 				
 				public void run() {
 					// TODO Auto-generated method stub
-					while(true) {
-						String url = getAUrl();
-						if(!filter.contains(url)) {
-							filter.add(url);
-							System.out.println("线程：" + Thread.currentThread().getName() + "正在抓取： " + url);
-							if(url != null) {
-								crawler(url);
+					try {
+						while(true) {
+							String url = getAUrl();
+							if(!filter.contains(url)) {
+								filter.add(url);
+								System.out.println("线程：" + Thread.currentThread().getName() + "正在解析： " + url);
+								if(url != null) {
+									crawler(url);
+								}
+							}else {
+								System.out.println("此url： " + url + "已存在，不再重复爬取！");
+								
 							}
-						}else {
-							System.out.println("此url： " + url + "已存在，不再重复爬取！");
 						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
 					}
+					
 				}
 			});
 			executor.execute(a);
@@ -121,48 +134,52 @@ public abstract class SpiderBase implements Serializable{
 	}; 
 	
 	// 监视线程
-	public void listenThreads() {
-		
-				new Thread(new Runnable() {
-					
-					public void run() {
-						// TODO Auto-generated method stub
-						while(true) {
-							try {
-								if(((ThreadPoolExecutor)executor).getActiveCount() < 10) {
-									Thread a = new Thread(new Runnable() {
-										
-										public void run() {
-											// TODO Auto-generated method stub
-											while(true) {
-												String url = getAUrl();
-												if(!filter.contains(url)) {
-													filter.add(url);
-													System.out.println("线程：" + Thread.currentThread().getName() + "正在抓取： " + url);
-													if(url != null) {
-														crawler(url);
-													}
-												}else {
-													System.out.println("此url： " + url + "已存在，不再重复爬取！");
+	public void listenThreads() throws Exception {
+
+		new Thread(new Runnable() {
+
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					try {
+						if (((ThreadPoolExecutor) executor).getActiveCount() < 10) {
+							Thread a = new Thread(new Runnable() {
+
+								public void run() {
+									// TODO Auto-generated method stub
+									while (true) {
+										try {
+											String url = getAUrl();
+											if (!filter.contains(url)) {
+												filter.add(url);
+												System.out.println(
+														"线程：" + Thread.currentThread().getName() + "正在抓取： " + url);
+												if (url != null) {
+													crawler(url);
 												}
+											} else {
+												System.out.println("此url： " + url + "已存在，不再重复爬取！");
 											}
+										} catch (Exception e) {
+											// TODO: handle exception
+											e.printStackTrace();
 										}
-									});
-									executor.execute(a);
-									if(urlQueue.size() == 0) {
-										System.out.println("队列为0，新闻已爬完！");
+
 									}
 								}
-								Thread.sleep(3000);
-							}catch (InterruptedException e) {
-								// TODO: handle exception
-								e.printStackTrace();
-							}
+							});
+							executor.execute(a);
 						}
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						// TODO: handle exception
+						e.printStackTrace();
 					}
-				}).start();
-	}; 
-	
+				}
+			}
+		}).start();
+	};
+
 	//监听程序结束，程序结束时序列化urlQueue和filter
 	public void listenEnd() {
 		
@@ -198,11 +215,11 @@ public abstract class SpiderBase implements Serializable{
 				
 	}; 
 	
-	//获取近三个月所有新闻url
+	//获取当天所有新闻url
 	public abstract void getAllUrls() ;
 	
-	// 获取近三个月的分类新闻每一天的入口
-	public abstract  List<String> getDateEntry(int col) ;
+	// 获取当天的分类新闻每一天的入口
+	public abstract String getDateEntry(int col) ;
 	
 	// 获取分类新闻每天的url，解析json数组，并放入阻塞队列
 	public abstract void getDateUrl(String dateEntryUrl) ;
@@ -234,8 +251,30 @@ public abstract class SpiderBase implements Serializable{
 		return dates;
 	}
 	
-	public String getAUrl() {
+	//设置日期，返回当前日期后并将当前日期设置为前一天
+	public static void setFrontDay() throws Exception{
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Calendar calendar = Calendar.getInstance();//获取日历实例  
+			calendar.setTime(sdf.parse(currentDate)); 
+			int day = calendar.get(Calendar.DATE); 
+			calendar.set(Calendar.DATE, day-1);  //设置为前一天
+			currentDate= sdf.format(calendar.getTime());//获得前一天
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public String getAUrl() throws Exception{
 		String url = "";
+		//如果列表为空了就设置日期为当前的前一天
+		if(urlQueue.size() == 0) {
+			System.out.println(currentDate + "的新闻已爬完！");
+			setFrontDay();
+			getAllUrls();
+		}
 		try {
 			url = urlQueue.take();
 			return url;

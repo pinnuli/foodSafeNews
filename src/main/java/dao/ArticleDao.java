@@ -24,7 +24,7 @@ public class ArticleDao {
 		Date date = new Date();
 		Timestamp timestamp = new Timestamp(date.getTime());
 		Connection conn = DBStatement.getConnection();
-		String sql="insert into articles_test " + 
+		String sql="insert into food_safe_articles " + 
 				"(title,content,category,src_from,article_url,pub_time,is_safe,deleted_at,created_at,updated_at) " +
 				"values (?,?,?,?,?,?,?,?,?,?)";
 		PreparedStatement ptmt=conn.prepareStatement(sql);

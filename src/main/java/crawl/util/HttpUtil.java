@@ -28,7 +28,6 @@ public class HttpUtil {
 			String ipPort = ipList.get(randomInt) ;
 			String proxyIp = ipPort.substring(0, ipPort.lastIndexOf(":"));
 			String proxyPort =ipPort.substring(ipPort.lastIndexOf(":") + 1, ipPort.length());
-			
 			System.setProperty("http.maxRedirects", "50");
 			System.getProperties().setProperty("http.proxyHost", proxyIp);
 			System.getProperties().setProperty("http.proxyPort", proxyPort);

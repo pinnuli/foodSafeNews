@@ -25,7 +25,7 @@ import static crawl.util.JsoupUtil.getDocument;
 public class ipSpider {
 	
 	//获取ip数量
-	static final int IPCOUNT = 10;
+	static final int IPCOUNT = 50;
 	static String  proxyHost = "http://www.xicidaili.com/nn/1";
 	static String userAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36";
 	static String testUrl = "http://ip.chinaz.com/getip.aspx";

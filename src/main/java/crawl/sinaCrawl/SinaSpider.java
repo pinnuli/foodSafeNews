@@ -27,25 +27,22 @@ public class SinaSpider extends SpiderBase {
 	static String urlPrefix = "http://roll.news.sina.com.cn/interface/rollnews_ch_out_interface.php?";
 	// 滚动新闻首页，即导航页
 	static String urlPostfix = "&ch=01&k=&offset_page=0&offset_num=0&spec=&type=&asc=&page=1&r=0.7635779715100255";
-
+	
+	
 	@Override
 	public void getAllUrls() {
 		// 按照新浪滚动页面的分类，从90-99分别代表不同分类
+		System.out.println("现在开始爬取" + currentDate + "的新闻！");
 		for (int col = 90; col <= 99; col++) {
-			List<String> dateEntryArray = new ArrayList<String>();
-			dateEntryArray = getDateEntry(col);
-			for (int i = 0; i < dateEntryArray.size(); i++) {
-				getDateUrl(dateEntryArray.get(i));
-				/* System.out.println(dateEntryArray.get(i)); */
-			}
+			String dateEntryUrl = "";
+			dateEntryUrl = getDateEntry(col);
+			getDateUrl(dateEntryUrl);
 		}
-
 	}
 
 	@Override
 	public void getDateUrl(String dateEntryUrl) {
 		List<String> dateurls = new ArrayList<String>();
-
 		try {
 			Document doc = getDocument(dateEntryUrl);
 			String jsonDataName = "var jsonData = ";
@@ -69,19 +66,14 @@ public class SinaSpider extends SpiderBase {
 	}
 
 	@Override
-	public List<String> getDateEntry(int col) {
-		List<String> dateEntryArray = new ArrayList<String>();
-		List<String> threeMonthDates = getThreeMonths();
-		for (int i = 0; i < threeMonthDates.size(); i++) {
-			String dateEntryUrl = urlPrefix;
-			dateEntryUrl += ("&col=" + col);
-			dateEntryUrl += ("&date=" + threeMonthDates.get(i));
-			dateEntryUrl += "&num=200";
-			dateEntryUrl += urlPostfix;
-			System.out.println("获取" + threeMonthDates.get(i) + "入口" + dateEntryUrl + "成功！");
-			dateEntryArray.add(dateEntryUrl);
-		}
-		return dateEntryArray;
+	public String getDateEntry(int col) {
+		String dateEntryUrl = urlPrefix;
+		dateEntryUrl += ("&col=" + col);
+		dateEntryUrl += ("&date=" + currentDate);
+		dateEntryUrl += "&num=200";
+		dateEntryUrl += urlPostfix;
+		System.out.println("获取" + currentDate + "入口" + dateEntryUrl + "成功！");
+		return dateEntryUrl;
 	}
 
 	@Override
@@ -106,7 +98,7 @@ public class SinaSpider extends SpiderBase {
 
 				if (!h1.isEmpty()) {
 					title = h1.get(h1.size() - 1).text();
-					if (Recognition.isSafe(title)) {
+					if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
 						category = doc.select(".channel-path a").first().text();
 						articleInfo = doc.select(".date-source").text();
 
