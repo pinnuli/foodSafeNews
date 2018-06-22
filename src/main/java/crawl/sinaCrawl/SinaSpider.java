@@ -42,6 +42,12 @@ public class SinaSpider extends SpiderBase {
 
 	@Override
 	public void getDateUrl(String dateEntryUrl) {
+		try {
+			Thread.currentThread().sleep(random.nextInt(1000));
+		} catch (InterruptedException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		List<String> dateurls = new ArrayList<String>();
 		try {
 			Document doc = getDocument(dateEntryUrl);
@@ -91,13 +97,14 @@ public class SinaSpider extends SpiderBase {
 			String orignalDate = "";
 			String articleInfo = "";
 			Article article = new Article();
-
+			System.out.println("正则解析：" + url);
 			try {
 				// 新浪新闻有时候开头有两个h1，有时只有一个，最后一个为新闻标题
 				Elements h1 = doc.select(".main-content h1");
-
+				
 				if (!h1.isEmpty()) {
 					title = h1.get(h1.size() - 1).text();
+					System.out.println(title);
 					if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
 						category = doc.select(".channel-path a").first().text();
 						articleInfo = doc.select(".date-source").text();
@@ -144,6 +151,9 @@ public class SinaSpider extends SpiderBase {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				// TODO: handle exception
 				return;
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
 		}

@@ -14,7 +14,7 @@ public class Recognition {
 	static final String REQUESTURL = "http://bringtree.ddns.net:5000/news_recognition";
 
 	//向判定模型发出http请求，接收判定结果并返回
-	public static boolean isSafe(String title) {
+	public static boolean isSafe(String title) throws InterruptedException {
 		HttpURLConnection con = null;
 		String param = "news_title=" + title;
 		try {
@@ -46,13 +46,26 @@ public class Recognition {
 			while ((temp = br.readLine()) != null) {
 				buffer.append(temp);
 				buffer.append("\n");
+				JSONObject response = new JSONObject(buffer.toString());
+				int code = response.getInt("code");
+				return (code==1) ? true : false;
 			}
-		} catch (Exception e) {
+		}catch (java.net.ConnectException e) {
+			Thread.currentThread().sleep(1000);
+			isSafe(title);
+			// TODO: handle exception
+		} catch (org.json.JSONException e) {
+			// TODO: handle exception
+			Thread.currentThread().sleep(1000);
+			isSafe(title);
+		} catch (java.net.SocketException e) {
+			// TODO: handle exception
+			Thread.currentThread().sleep(1000);
+			isSafe(title);
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		JSONObject response = new JSONObject(buffer.toString());
-		int code = response.getInt("code");
-		return (code==1) ? true : false;
+		return false;
 	}
 	
 }

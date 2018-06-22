@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import crawl.service.SpiderBase;
+import crawl.util.HttpUtil;
 import crawl.util.Recognition;
 import dao.ArticleDao;
 import model.Article;
@@ -31,6 +32,7 @@ public class TecentSpider extends SpiderBase {
 		System.out.println("现在开始爬取" + currentDate + "的新闻！");
 		String dateEntryUrl = getDateEntry(0);
 		getDateUrl(dateEntryUrl);
+		System.out.println(urlQueue.size());
 	}
 
 	@Override
@@ -38,6 +40,7 @@ public class TecentSpider extends SpiderBase {
 		List<String> dateurls = new ArrayList<String>();
 
 		try {
+			Thread.currentThread().sleep(random.nextInt(500) + 500);
 			Document doc = getDocument(dateEntryUrl);
 			String jsonHtml = doc.select("body").text();
 			JSONObject data = new JSONObject(jsonHtml);
@@ -53,6 +56,9 @@ public class TecentSpider extends SpiderBase {
 			}
 		} catch (JSONException e) {
 			// TODO: handle exception
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -84,6 +90,7 @@ public class TecentSpider extends SpiderBase {
 			Article article = new Article();
 			try {
 				title = doc.select(".qq_article h1").text();
+				System.out.println(title);
 				if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
 					category = doc.select(".a_catalog a").text();
 					srcFrom = doc.select(".a_source a").text();
@@ -104,12 +111,12 @@ public class TecentSpider extends SpiderBase {
 					article.setContent(content);
 
 					// 打印一下新闻信息
-					System.out.println("爬取成功：" + article);
+					System.out.println("食品安全相关，爬取成功：" + article);
 					// 添加到数据库
 					try {
 						ArticleDao dao = new ArticleDao();
 						dao.addArticle(article);
-						System.out.println("添加到数据库成功");
+						System.out.println("添加到数据库成功！");
 					} catch (Exception e) {
 						// TODO: handle exception
 						e.printStackTrace();
@@ -123,6 +130,9 @@ public class TecentSpider extends SpiderBase {
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

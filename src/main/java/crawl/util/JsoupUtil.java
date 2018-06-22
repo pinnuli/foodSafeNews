@@ -1,5 +1,7 @@
 package crawl.util;
 
+import java.io.IOException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -38,7 +40,7 @@ public class JsoupUtil {
 			
 			return doc;
 
-		} catch (Exception e) {
+		} catch (org.jsoup.UncheckedIOException  e) {
 			// TODO: handle exception
 			if (requestCount < 10) {
 				requestCount++;
@@ -49,6 +51,8 @@ public class JsoupUtil {
 				System.out.println("请求次数已超过10次，放弃抓取此新闻！");
 				return doc;
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 		return doc;
 	}

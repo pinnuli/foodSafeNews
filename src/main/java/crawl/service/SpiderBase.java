@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -50,6 +51,8 @@ public abstract class SpiderBase implements Serializable{
 	//布隆算法去重
 	protected static BloomFilter filter = new BloomFilter();
 	
+	protected static Random random = new Random();
+	
 	protected static String urlPrefix = "";
 	
 	protected static String urlPostfix = "";
@@ -74,8 +77,12 @@ public abstract class SpiderBase implements Serializable{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar calendar = Calendar.getInstance();//获取日历实例  
 		Date d = new Date();  
-        currentDate = sdf.format(d);    
-		getStart();
+		Date dBefore = new Date();
+		calendar.setTime(d);//把当前时间赋给日历  
+        calendar.add(Calendar.MONTH, 0);  //设置为前3月  
+        dBefore = calendar.getTime();   //得到前3月的时间  
+        currentDate = sdf.format(dBefore);    
+		getStart(); 
 		mutilThreads();
 		listenThreads();
 		listenEnd();
@@ -83,7 +90,7 @@ public abstract class SpiderBase implements Serializable{
 	}
 	
 	//检查是否已经有爬过的url
-	public void getStart() {
+	public void getStart() throws Exception{
 		File urlsSer = new File("urlQueue.ser");
 		if(urlsSer.exists()) {
 			try {
@@ -100,7 +107,10 @@ public abstract class SpiderBase implements Serializable{
 		}
 		else {
 			urlQueue = new LinkedBlockingQueue<String>();
-			getAllUrls();
+			while(urlQueue.size() < 200) {
+				setFrontDay();
+				getAllUrls();
+			}
 		}
 	}
 	
@@ -119,6 +129,7 @@ public abstract class SpiderBase implements Serializable{
 								System.out.println("线程：" + Thread.currentThread().getName() + "正在解析： " + url);
 								if(url != null) {
 									crawler(url);
+									Thread.currentThread().sleep(1000);
 								}
 							}else {
 								System.out.println("此url： " + url + "已存在，不再重复爬取！");
@@ -250,10 +261,15 @@ public abstract class SpiderBase implements Serializable{
 		//如果列表为空了就设置日期为当前的前一天
 		if(urlQueue.size() == 0) {
 			System.out.println(currentDate + "的新闻已爬完！");
-			setFrontDay();
-			getAllUrls();
+			//线程休眠时间随机，避免多线程同时请求导致请求频率超过限制
+			Thread.currentThread().sleep( random.nextInt(500)+500);
+			while(urlQueue.size() < 10000) {
+				setFrontDay();
+				getAllUrls();
+			}
 		}
 		try {
+			System.out.println("url队列中还有" + urlQueue.size());
 			url = urlQueue.take();
 			return url;
 		} catch (InterruptedException e) {
