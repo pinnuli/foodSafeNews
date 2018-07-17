@@ -85,7 +85,7 @@ public class SinaSpider extends SpiderBase {
 	@Override
 	public void crawler(String url) {
 		Document doc = getDocument(url);
-
+		System.out.println(doc);
 		// 新浪的新闻url中间是格式为xxxx-xx-xx的日期
 		String pattern = ".*/\\d{4}-\\d{2}-\\d{2}/.*";
 		if (Pattern.matches(pattern, url)) {
@@ -105,7 +105,7 @@ public class SinaSpider extends SpiderBase {
 				if (!h1.isEmpty()) {
 					title = h1.get(h1.size() - 1).text();
 					System.out.println(title);
-					if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
+					//if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
 						category = doc.select(".channel-path a").first().text();
 						articleInfo = doc.select(".date-source").text();
 
@@ -145,16 +145,13 @@ public class SinaSpider extends SpiderBase {
 							e.printStackTrace();
 						}
 						System.out.println("食品安全相关，成功添加到数据库！");
-					}
+					//}
 				}
 
 			} catch (ArrayIndexOutOfBoundsException e) {
 				// TODO: handle exception
 				return;
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} 
 
 		}
 	}

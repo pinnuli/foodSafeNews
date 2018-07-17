@@ -91,7 +91,7 @@ public class TecentSpider extends SpiderBase {
 			try {
 				title = doc.select(".qq_article h1").text();
 				System.out.println(title);
-				if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
+				//if (Recognition.isSafe(title)) {//如果是食品安全相关则继续解析并放入数据库
 					category = doc.select(".a_catalog a").text();
 					srcFrom = doc.select(".a_source a").text();
 					pubTime = doc.select(".a_time").text();
@@ -121,7 +121,7 @@ public class TecentSpider extends SpiderBase {
 						// TODO: handle exception
 						e.printStackTrace();
 					}
-				}
+				//}
 
 			} catch (ArrayIndexOutOfBoundsException e) {
 				// TODO: handle exception
@@ -131,7 +131,7 @@ public class TecentSpider extends SpiderBase {
 					e2.printStackTrace();
 				}
 				e.printStackTrace();
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

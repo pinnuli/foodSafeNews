@@ -107,10 +107,9 @@ public abstract class SpiderBase implements Serializable{
 		}
 		else {
 			urlQueue = new LinkedBlockingQueue<String>();
-			while(urlQueue.size() < 200) {
 				setFrontDay();
 				getAllUrls();
-			}
+			
 		}
 	}
 	
@@ -129,7 +128,7 @@ public abstract class SpiderBase implements Serializable{
 								System.out.println("线程：" + Thread.currentThread().getName() + "正在解析： " + url);
 								if(url != null) {
 									crawler(url);
-									Thread.currentThread().sleep(1000);
+									//Thread.currentThread().sleep(1000);
 								}
 							}else {
 								System.out.println("此url： " + url + "已存在，不再重复爬取！");
@@ -185,7 +184,7 @@ public abstract class SpiderBase implements Serializable{
 							executor.execute(a);
 						}
 						Thread.sleep(3000);
-					} catch (InterruptedException e) {
+					} catch (Exception e) {
 						// TODO: handle exception
 						e.printStackTrace();
 					}
@@ -259,15 +258,18 @@ public abstract class SpiderBase implements Serializable{
 	public String getAUrl() throws Exception{
 		String url = "";
 		//如果列表为空了就设置日期为当前的前一天
-		if(urlQueue.size() == 0) {
-			System.out.println(currentDate + "的新闻已爬完！");
-			//线程休眠时间随机，避免多线程同时请求导致请求频率超过限制
-			Thread.currentThread().sleep( random.nextInt(500)+500);
-			while(urlQueue.size() < 10000) {
-				setFrontDay();
-				getAllUrls();
+		synchronized (this){
+			if(urlQueue.size() == 0 ) {
+				System.out.println(currentDate + "的新闻已爬完！");
+				//线程休眠时间随机，避免多线程同时请求导致请求频率超过限制
+				//Thread.currentThread().sleep( random.nextInt(500)+500);
+				//while(urlQueue.size() < 10000) {
+					setFrontDay();
+					getAllUrls();
+				//}
 			}
 		}
+
 		try {
 			System.out.println("url队列中还有" + urlQueue.size());
 			url = urlQueue.take();
